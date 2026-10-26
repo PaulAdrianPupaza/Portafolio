@@ -83,7 +83,8 @@ const P = {
   arrive: { dx: -1.5, dy: -0.55, rot: -0.12, armL: 2.5, armR: 0.3, wave: 1 },
   bots: { dx: -1.45, dy: -0.85, rot: 0.15, armL: 0.4, armR: -1.1, wave: 0 },
   aios: { dx: 1.05, dy: 0.95, rot: 0.2, armL: 1.3, armR: 0.2, wave: 0 },
-  construction: { dx: 1.0, dy: -1.05, rot: 0.1, armL: 0.9, armR: 0.2, wave: 0 },
+  // Kept clear of the header controls in the top-right corner.
+  construction: { dx: 1.05, dy: -0.5, rot: 0.1, armL: 0.9, armR: 0.2, wave: 0 },
   outro: { dx: -1.3, dy: -1.2, rot: -0.35, armL: 2.6, armR: 0.4, wave: 0 },
 } satisfies Record<MoonBeatId, Pose>;
 

@@ -19,6 +19,13 @@ const OVERLAP = 1.2;
 
 export const JOURNEY_DURATION = EARTH_DURATION + MOON_DURATION + SUN_DURATION - 2 * OVERLAP;
 
+/** Global start time of each chapter, for anchors and chapter navigation. */
+export const CHAPTER_STARTS = {
+  earth: 0,
+  moon: EARTH_DURATION - OVERLAP,
+  sun: EARTH_DURATION + MOON_DURATION - 2 * OVERLAP,
+} as const;
+
 /**
  * Earth → Moon → Sun on a single timeline. Each chapter gets its own local
  * time; where two chapters overlap the next one is blended over the last.
@@ -44,11 +51,6 @@ export class Journey implements Story {
     );
   }
 
-  /** Global start time of a chapter, for links that jump straight to it. */
-  chapterStart(id: string) {
-    return this.chapters.find((c) => c.chapter.id === id)?.start ?? 0;
-  }
-
   async init() {
     this.assets ??= { earth: new EarthGL(), moon: new MoonGL() };
   }
@@ -62,9 +64,10 @@ export class Journey implements Story {
   draw(ctx: CanvasRenderingContext2D, frame: FrameInput) {
     const assets = this.assets;
     if (!assets) return;
-    const t = clamp(frame.t, 0, this.duration);
+    // A NaN time (e.g. scroll measured before layout) must never leave the frame empty.
+    const t = Number.isFinite(frame.t) ? clamp(frame.t, 0, this.duration) : 0;
     const active = this.chapters.filter(({ chapter, start }) => t >= start && t <= start + chapter.duration);
-    const [first, second] = active;
+    const [first = this.chapters[0], second] = active;
     first.chapter.draw(ctx, { ...frame, t: t - first.start }, assets);
     if (!second) return;
 

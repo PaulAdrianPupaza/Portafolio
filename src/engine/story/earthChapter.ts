@@ -17,7 +17,8 @@ export type EarthBeatId = "intro" | "home" | "study" | "teach" | "languages" | "
 export type EarthCopy = Record<EarthBeatId, CaptionLine[]>;
 
 const BEATS: (Beat & { id: EarthBeatId })[] = [
-  { id: "intro", start: 0.4, end: 5 },
+  // Starts before 0 so the name is already on screen on the very first frame.
+  { id: "intro", start: -1.3, end: 5 },
   { id: "home", start: 6.8, end: 11.2 },
   { id: "study", start: 12, end: 16.6 },
   { id: "teach", start: 17.8, end: 22.4 },

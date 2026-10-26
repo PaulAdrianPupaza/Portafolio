@@ -3,13 +3,24 @@ import type { Dictionary } from "./types";
 // On-screen captions: sentence case (capitals only for sentence starts and names), no full stops.
 const en: Dictionary = {
   meta: {
-    title: "Paul Adrian Pupaza · Software Engineer",
+    title: "Paul Adrian Pupaza · Software Engineering student",
     description:
-      "Portfolio of Paul Adrian Pupaza, final-year Software Engineering student in Barcelona focused on backend services, data handling and LLM integration.",
+      "Portfolio of Paul Adrian Pupaza, final-year Software Engineering student in Barcelona looking for a software engineering internship for summer 2027. Backend services, data handling and LLM integration.",
   },
-  nav: { faq: "FAQ", languageLabel: "Language", scrollHint: "SCROLL TO EXPLORE" },
+  nav: {
+    languageLabel: "Language",
+    chaptersLabel: "Chapters",
+    scrollHint: "SCROLL TO EXPLORE",
+    about: "About",
+    faq: "FAQ",
+    projects: "Projects",
+    skills: "Skills",
+    contact: "Contact",
+  },
+  actions: { email: "Email", linkedin: "LinkedIn", github: "GitHub", cv: "CV (PDF)", code: "Code", demo: "Live demo" },
+  projects: { bots: "Bots&Dragons", aios: "AI-OS", construction: "Construction platform" },
   story: {
-    heading: "Paul Adrian Pupaza, Software Engineer",
+    heading: "Paul Adrian Pupaza, final-year Software Engineering student",
     summary: [
       "Final-year Software Engineering student focused on backend services, data handling and LLM integration.",
       "Based in Barcelona, Spain, and authorised to work in the EU, including Ireland.",
@@ -85,8 +96,8 @@ const en: Dictionary = {
     earth: {
       intro: [
         { text: "Paul Adrian Pupaza", tone: "white", size: "xl" },
-        { text: "Software engineer", tone: "gold", size: "md" },
-        { text: "Backend · Data · LLM integration", tone: "teal", size: "sm" },
+        { text: "Final-year Software Engineering student", tone: "gold", size: "md" },
+        { text: "Looking for a SWE internship · Summer 2027", tone: "teal", size: "sm" },
       ],
       home: [
         { text: "Home base", tone: "gold", size: "sm" },
@@ -137,6 +148,7 @@ const en: Dictionary = {
       {
         q: "What have you built?",
         a: "Bots&Dragons: a FastAPI REST API connecting a JavaScript frontend to a Python backend, with an LLM that turns chat input into game mechanics. AI-OS: a modular desktop assistant in Rust and Tauri that carries out OS-level tasks from natural-language commands through a secure execution pipeline. A construction company web platform built with Next.js, TypeScript and PostgreSQL on Supabase, with secured API routes and server-side validation.",
+        projects: true,
       },
       {
         q: "Which technologies do you use?",
@@ -152,7 +164,7 @@ const en: Dictionary = {
       },
     ],
   },
-  contact: { title: "Say hello", email: "Email", linkedin: "LinkedIn", github: "GitHub" },
+  contact: { title: "Say hello" },
 };
 
 export default en;

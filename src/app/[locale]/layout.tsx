@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
       locale: locale === "es" ? "es_ES" : "en_GB",
       type: "website",
     },
+    twitter: { card: "summary_large_image", title: dict.meta.title, description: dict.meta.description },
   };
 }
 

@@ -16,10 +16,92 @@
   height: 100%;
 }
 
+.anchor {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* Buttons that belong to the beat on screen: below the captions on wide
+   screens, under the header on phones (the captions sit at the bottom there). */
+.actions {
+  position: absolute;
+  left: 7%;
+  top: 74%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 46%;
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.action,
+.primary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.action {
+  background: var(--pill);
+  color: var(--teal);
+  backdrop-filter: blur(6px);
+}
+
+.primary {
+  background: var(--teal);
+  color: #062030;
+}
+
+.action:hover,
+.primary:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-aspect-ratio: 9/10) {
+  .actions {
+    left: 16px;
+    right: 16px;
+    top: 84px;
+    max-width: none;
+    justify-content: center;
+    gap: 8px;
+    animation-name: rise-centered;
+  }
+
+  .action,
+  .primary {
+    padding: 0 16px;
+    font-size: 14px;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+@keyframes rise-centered {
+  from {
+    opacity: 0;
+    translate: 0 -8px;
+  }
+}
+
 .hint {
   position: absolute;
   left: 50%;
-  bottom: 28px;
+  bottom: calc(28px + env(safe-area-inset-bottom));
   margin: 0;
   padding: 10px 20px;
   border-radius: 999px;
@@ -27,6 +109,7 @@
   color: var(--teal);
   font-size: 13px;
   letter-spacing: 4px;
+  white-space: nowrap;
   transform: translateX(-50%);
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s;
   animation: bob 2.4s ease-in-out infinite;
@@ -48,8 +131,101 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+.fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 96px 24px 48px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.fallbackHeading {
+  color: var(--text);
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Chapter navigation: a column of dots on the right edge. */
+.chapters {
+  position: fixed;
+  right: clamp(4px, 1.5vw, 20px);
+  top: 50%;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(-50%);
+}
+
+.chapters a {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  margin-right: 17px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  transition: transform 0.3s, background 0.3s;
+}
+
+.chapters a[aria-current="step"] .dot {
+  background: var(--teal);
+  transform: scale(1.5);
+}
+
+.chapterLabel {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--pill);
+  font-size: 13px;
+  opacity: 0;
+  translate: 6px 0;
+  transition: opacity 0.25s, translate 0.25s;
+  pointer-events: none;
+}
+
+.chapters a:hover .chapterLabel,
+.chapters a:focus-visible .chapterLabel {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (max-width: 640px) {
+  .dot {
+    margin-right: 12px;
+  }
+
+  /* On phones the dots would sit on top of the FAQ text. */
+  .chapters[data-section="contact"] {
+    visibility: hidden;
+  }
+
   .hint {
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    padding: 6px 14px;
+    font-size: 11px;
+    letter-spacing: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint,
+  .actions {
     animation: none;
   }
 }

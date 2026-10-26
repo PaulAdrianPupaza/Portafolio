@@ -3,13 +3,24 @@ import type { Dictionary } from "./types";
 // Textos en pantalla: mayúscula solo al inicio de frase y en nombres propios, sin puntos finales.
 const es: Dictionary = {
   meta: {
-    title: "Paul Adrian Pupaza · Ingeniero de software",
+    title: "Paul Adrian Pupaza · Estudiante de Ingeniería de Software",
     description:
-      "Portafolio de Paul Adrian Pupaza, estudiante de último curso de Ingeniería de Software en Barcelona centrado en servicios backend, gestión de datos e integración de LLM.",
+      "Portafolio de Paul Adrian Pupaza, estudiante de último curso de Ingeniería de Software en Barcelona que busca prácticas de ingeniería de software para el verano de 2027. Servicios backend, gestión de datos e integración de LLM.",
   },
-  nav: { faq: "FAQ", languageLabel: "Idioma", scrollHint: "HAZ SCROLL PARA EXPLORAR" },
+  nav: {
+    languageLabel: "Idioma",
+    chaptersLabel: "Capítulos",
+    scrollHint: "DESLIZA PARA EXPLORAR",
+    about: "Sobre mí",
+    faq: "FAQ",
+    projects: "Proyectos",
+    skills: "Habilidades",
+    contact: "Contacto",
+  },
+  actions: { email: "Email", linkedin: "LinkedIn", github: "GitHub", cv: "CV (PDF)", code: "Código", demo: "Demo" },
+  projects: { bots: "Bots&Dragons", aios: "AI-OS", construction: "Plataforma para una constructora" },
   story: {
-    heading: "Paul Adrian Pupaza, ingeniero de software",
+    heading: "Paul Adrian Pupaza, estudiante de último curso de Ingeniería de Software",
     summary: [
       "Estudiante de último curso de Ingeniería de Software centrado en servicios backend, gestión de datos e integración de LLM.",
       "Vive en Barcelona y tiene autorización para trabajar en la UE, incluida Irlanda.",
@@ -89,8 +100,8 @@ const es: Dictionary = {
     earth: {
       intro: [
         { text: "Paul Adrian Pupaza", tone: "white", size: "xl" },
-        { text: "Ingeniero de software", tone: "gold", size: "md" },
-        { text: "Backend · Datos · Integración de LLM", tone: "teal", size: "sm" },
+        { text: "Estudiante de último curso de Ingeniería de Software", tone: "gold", size: "md" },
+        { text: "Busco prácticas de ingeniería de software · Verano 2027", tone: "teal", size: "sm" },
       ],
       home: [
         { text: "Mi base", tone: "gold", size: "sm" },
@@ -139,8 +150,9 @@ const es: Dictionary = {
         a: "Desde septiembre de 2025 soy profesor asistente de Proyectos Web I y II en La Salle BCN. Reviso y califico más de 400 entregas de código por semestre de más de 100 estudiantes, les ayudo a depurar y a aplicar principios de ingeniería (lo que ha contribuido a mejorar la calidad de las entregas un 22 %) y diseño proyectos prácticos sobre APIs REST, MVC y buenas prácticas de backend.",
       },
       {
-        q: "¿Qué has construido?",
+        q: "¿Qué proyectos has hecho?",
         a: "Bots&Dragons: una API REST con FastAPI que conecta un frontend en JavaScript con un backend en Python, con un LLM que convierte el chat en mecánicas de juego. AI-OS: un asistente de escritorio modular en Rust y Tauri que ejecuta tareas del sistema operativo a partir de órdenes en lenguaje natural mediante un pipeline de ejecución seguro. Una plataforma web para una constructora con Next.js, TypeScript y PostgreSQL en Supabase, con rutas de API protegidas y validación en el servidor.",
+        projects: true,
       },
       {
         q: "¿Qué tecnologías usas?",
@@ -156,7 +168,7 @@ const es: Dictionary = {
       },
     ],
   },
-  contact: { title: "Escríbeme", email: "Email", linkedin: "LinkedIn", github: "GitHub" },
+  contact: { title: "Escríbeme" },
 };
 
 export default es;

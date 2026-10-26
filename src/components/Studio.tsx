@@ -26,6 +26,7 @@ export function Studio({ copy, locale }: { copy: JourneyCopy; locale: string }) 
   const [sheet, setSheet] = useState<Output | null>(null);
   const [video, setVideo] = useState<Output | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const duration = JOURNEY_DURATION;
 
   useEffect(() => {
@@ -74,6 +75,23 @@ export function Studio({ copy, locale }: { copy: JourneyCopy; locale: string }) 
       setSheet({ url: URL.createObjectURL(blob), name: `journey-contact-sheet-${locale}.png` });
     });
     rendererRef.current?.render(t, t);
+  };
+
+  // The share image is a real frame of the story: the intro with the name on screen.
+  const saveShareImage = async () => {
+    const story = storyRef.current;
+    if (!story) return;
+    setError(null);
+    const canvas = document.createElement("canvas");
+    const renderer = new Renderer(canvas, story);
+    renderer.resize(1200, 630);
+    renderer.render(1.2, 1.2);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+    rendererRef.current?.render(t, t);
+    if (!blob) return setError("Could not encode the share image");
+    const res = await fetch("/api/dev/og-image", { method: "POST", body: blob });
+    setError(res.ok ? null : `Saving the share image failed (${res.status})`);
+    setNotice(res.ok ? "Share image saved to src/app/[locale]/opengraph-image.png and twitter-image.png" : null);
   };
 
   const makeVideo = async () => {
@@ -130,6 +148,9 @@ export function Studio({ copy, locale }: { copy: JourneyCopy; locale: string }) 
         <button onClick={makeVideo} disabled={!ready || busy}>
           Export MP4 · 1920×1080 · 30 fps
         </button>
+        <button onClick={saveShareImage} disabled={!ready || busy}>
+          Save share image · 1200×630
+        </button>
         {busy && (
           <>
             <progress value={progress ?? 0} max={1} />
@@ -140,6 +161,7 @@ export function Studio({ copy, locale }: { copy: JourneyCopy; locale: string }) 
       </div>
 
       {error && <p className={styles.error}>{error}</p>}
+      {notice && <p className={styles.time}>{notice}</p>}
 
       {video && (
         <section className={styles.output}>

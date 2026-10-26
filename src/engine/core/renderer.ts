@@ -22,6 +22,8 @@ export interface RenderOptions {
    * blended, which is the motion blur used by the video export.
    */
   shutter?: number;
+  /** Reduced motion: chapters skip flashes and similar effects. */
+  calm?: boolean;
 }
 
 export class Renderer {
@@ -52,7 +54,7 @@ export class Renderer {
   }
 
   /** seek(t): renders the frame for (t, ambient). Same inputs, same pixels. */
-  render(t: number, ambient: number, { shutter = 0 }: RenderOptions = {}) {
+  render(t: number, ambient: number, { shutter = 0, calm = false }: RenderOptions = {}) {
     const { ctx } = this;
     const W = this.canvas.width;
     const H = this.canvas.height;
@@ -60,17 +62,17 @@ export class Renderer {
 
     if (shutter > 0) {
       const half = shutter / 4;
-      this.story.draw(ctx, { t: t - half, ambient: ambient - half, W, H });
+      this.story.draw(ctx, { t: t - half, ambient: ambient - half, W, H, calm });
       const scratch = this.scratchCanvas(W, H);
       const sctx = scratch.getContext("2d", { alpha: false })!;
       sctx.setTransform(1, 0, 0, 1, 0, 0);
-      this.story.draw(sctx, { t: t + half, ambient: ambient + half, W, H });
+      this.story.draw(sctx, { t: t + half, ambient: ambient + half, W, H, calm });
       ctx.save();
       ctx.globalAlpha = 0.5;
       ctx.drawImage(scratch, 0, 0);
       ctx.restore();
     } else {
-      this.story.draw(ctx, { t, ambient, W, H });
+      this.story.draw(ctx, { t, ambient, W, H, calm });
     }
 
     drawFinish(ctx, W, H, ambient);

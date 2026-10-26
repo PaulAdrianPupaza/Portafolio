@@ -16,6 +16,8 @@ export interface FrameInput {
   /** Canvas size in device pixels. */
   W: number;
   H: number;
+  /** Reduced motion: skip effects such as full-screen flashes. */
+  calm?: boolean;
 }
 
 export interface View {

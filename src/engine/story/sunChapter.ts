@@ -94,7 +94,7 @@ export class SunChapter implements Chapter {
     this.captions = BEATS.map((b) => ({ start: b.start, end: b.end, lines: copy[b.id] }));
   }
 
-  draw(ctx: CanvasRenderingContext2D, { t, ambient, W, H }: FrameInput) {
+  draw(ctx: CanvasRenderingContext2D, { t, ambient, W, H, calm }: FrameInput) {
     const portrait = W / H < 0.9;
     const view = makeView(W, H, sampleTrack(CAMERA[portrait ? "portrait" : "landscape"], t));
     const unit = depthScale(view, 0.5);
@@ -112,12 +112,17 @@ export class SunChapter implements Chapter {
     const look = t > 27 ? { x: view.W * 0.3, y: view.H * 0.6 } : sun;
     drawMascot(ctx, view, POSES, SUN, t, ambient, look);
 
-    // Diving into the Sun washes the frame with light, then pulls back out.
-    const flash = smoothstep(25.4, 26.4, t) * (1 - smoothstep(27, 27.8, t));
+    // Diving into the Sun warms the frame with a soft glow, then pulls back
+    // out. Kept partial and brief so it never becomes a full white flash;
+    // skipped entirely for reduced motion.
+    const flash = calm ? 0 : smoothstep(25.8, 26.4, t) * (1 - smoothstep(26.8, 27.4, t));
     if (flash > 0) {
+      const glow = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.hypot(W, H) / 2);
+      glow.addColorStop(0, "rgba(255,226,170,0.55)");
+      glow.addColorStop(1, "rgba(255,143,74,0.35)");
       ctx.save();
       ctx.globalAlpha = flash;
-      ctx.fillStyle = "#fff7dc";
+      ctx.fillStyle = glow;
       ctx.fillRect(0, 0, W, H);
       ctx.restore();
     }

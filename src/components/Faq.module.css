@@ -1,6 +1,7 @@
 .section {
   background: linear-gradient(var(--space-bottom), #0b1834);
   padding: clamp(64px, 12vh, 120px) 16px clamp(64px, 10vh, 100px);
+  scroll-margin-top: 0;
 }
 
 .inner {
@@ -20,6 +21,8 @@
 
 .contactTitle {
   margin-top: 64px;
+  /* Leaves room for the fixed header when jumped to from "Contact". */
+  scroll-margin-top: 96px;
 }
 
 .list {
@@ -30,7 +33,6 @@
 .item {
   border-radius: 28px;
   background: var(--pill);
-  overflow: hidden;
 }
 
 .question {
@@ -38,29 +40,46 @@
   list-style: none;
   padding: 18px 56px 18px 24px;
   position: relative;
+  border-radius: 28px;
   font-size: clamp(16px, 2.4vw, 19px);
   font-weight: 700;
+}
+
+/* Focus ring drawn inside the pill so nothing clips it. */
+.question:focus-visible {
+  outline-offset: -4px;
 }
 
 .question::-webkit-details-marker {
   display: none;
 }
 
+/* A "+" that turns into a "×" when the answer is open. */
+.question::before,
 .question::after {
   content: "";
   position: absolute;
   right: 24px;
   top: 50%;
-  width: 14px;
-  height: 14px;
-  margin-top: -7px;
-  border-radius: 4px;
+  width: 16px;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 2px;
   background: var(--teal);
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.4s;
+}
+
+.question::after {
+  transform: rotate(90deg);
+}
+
+.item[open] .question::before {
+  transform: rotate(45deg);
+  background: var(--gold);
 }
 
 .item[open] .question::after {
-  transform: rotate(45deg) scale(0.8);
+  transform: rotate(135deg);
   background: var(--gold);
 }
 
@@ -73,6 +92,38 @@
   line-height: 1.6;
 }
 
+.projects {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0 24px 24px;
+  list-style: none;
+}
+
+.projects li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.projects span {
+  min-width: 12em;
+  color: var(--text);
+}
+
+.projects a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(143, 216, 230, 0.14);
+  color: var(--teal);
+  text-decoration: none;
+  font-size: 14px;
+}
+
 .contact {
   display: flex;
   flex-wrap: wrap;
@@ -83,8 +134,10 @@
 }
 
 .contact a {
-  display: inline-block;
-  padding: 12px 22px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 22px;
   border-radius: 999px;
   background: var(--teal);
   color: #062030;
@@ -101,4 +154,19 @@
 
 .contact li:nth-child(3) a {
   background: #f3f7fb;
+}
+
+.contact li:nth-child(4) a {
+  background: var(--coral);
+}
+
+.email {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.email a {
+  color: var(--text);
+  user-select: all;
 }
