@@ -5,7 +5,7 @@ const en: Dictionary = {
   meta: {
     title: "Paul Adrian Pupaza · Software Engineering student",
     description:
-      "Portfolio of Paul Adrian Pupaza, final-year Software Engineering student in Barcelona looking for a software engineering internship for summer 2027. Backend services, data handling and LLM integration.",
+      "Portfolio of Paul Adrian Pupaza, final-year Software Engineering student in Barcelona looking for a software engineering internship. Backend services, data handling and LLM integration.",
   },
   nav: {
     languageLabel: "Language",
@@ -97,7 +97,7 @@ const en: Dictionary = {
       intro: [
         { text: "Paul Adrian Pupaza", tone: "white", size: "xl" },
         { text: "Final-year Software Engineering student", tone: "gold", size: "md" },
-        { text: "Looking for a SWE internship · Summer 2027", tone: "teal", size: "sm" },
+        { text: "Looking for a SWE internship", tone: "teal", size: "sm" },
       ],
       home: [
         { text: "Home base", tone: "gold", size: "sm" },
@@ -135,7 +135,7 @@ const en: Dictionary = {
       },
       {
         q: "What kind of role are you looking for?",
-        a: "Software engineering internships for summer 2027, especially work on backend services, data and LLM integration.",
+        a: "Software engineering internships, especially work on backend services, data and LLM integration.",
       },
       {
         q: "Where are you based, and can you work in Ireland or elsewhere in the EU?",

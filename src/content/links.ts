@@ -11,7 +11,7 @@ export const CONTACT = {
  * Public path of the CV PDF (a file in `public/`), or null while there is
  * none: every CV button hides itself until this is set.
  */
-export const CV_URL: string | null = null;
+export const CV_URL: string | null = "/Paul-Adrian-Pupaza-CV.pdf";
 
 export type ProjectId = "bots" | "aios" | "construction";
 
@@ -20,7 +20,7 @@ export type ProjectId = "bots" | "aios" | "construction";
  * buttons fall back to the GitHub profile.
  */
 export const PROJECT_LINKS: Record<ProjectId, { code?: string; demo?: string }> = {
-  bots: {},
-  aios: {},
-  construction: {},
+  bots: { code: "https://github.com/zigeng-zhu/BotsAndDragons" },
+  aios: { code: "https://github.com/PaulAdrianPupaza/AI_OS" },
+  construction: { code: "https://github.com/PaulAdrianPupaza/decoady-app" },
 };

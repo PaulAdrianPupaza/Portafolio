@@ -5,7 +5,7 @@ const es: Dictionary = {
   meta: {
     title: "Paul Adrian Pupaza · Estudiante de Ingeniería de Software",
     description:
-      "Portafolio de Paul Adrian Pupaza, estudiante de último curso de Ingeniería de Software en Barcelona que busca prácticas de ingeniería de software para el verano de 2027. Servicios backend, gestión de datos e integración de LLM.",
+      "Portafolio de Paul Adrian Pupaza, estudiante de último curso de Ingeniería de Software en Barcelona que busca prácticas de ingeniería de software. Servicios backend, gestión de datos e integración de LLM.",
   },
   nav: {
     languageLabel: "Idioma",
@@ -101,7 +101,7 @@ const es: Dictionary = {
       intro: [
         { text: "Paul Adrian Pupaza", tone: "white", size: "xl" },
         { text: "Estudiante de último curso de Ingeniería de Software", tone: "gold", size: "md" },
-        { text: "Busco prácticas de ingeniería de software · Verano 2027", tone: "teal", size: "sm" },
+        { text: "Busco prácticas de ingeniería de software", tone: "teal", size: "sm" },
       ],
       home: [
         { text: "Mi base", tone: "gold", size: "sm" },
@@ -139,7 +139,7 @@ const es: Dictionary = {
       },
       {
         q: "¿Qué tipo de puesto buscas?",
-        a: "Prácticas de ingeniería de software para el verano de 2027, sobre todo en servicios backend, datos e integración de LLM.",
+        a: "Prácticas de ingeniería de software, sobre todo en servicios backend, datos e integración de LLM.",
       },
       {
         q: "¿Dónde vives? ¿Puedes trabajar en Irlanda o en otro país de la UE?",
