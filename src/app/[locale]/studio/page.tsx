@@ -12,5 +12,5 @@ export default async function StudioPage({ params }: PageProps<"/[locale]/studio
   const { locale } = await params;
   if (!hasLocale(locale)) notFound();
   const dict = await getDictionary(locale);
-  return <Studio copy={dict.earth} locale={locale} />;
+  return <Studio copy={dict.journey} locale={locale} />;
 }

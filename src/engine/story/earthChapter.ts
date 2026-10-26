@@ -1,16 +1,17 @@
-import { clamp, easeOutCubic, invLerp, lerp, lerpDeg, springKick } from "../core/math";
-import type { Beat, Story } from "../core/renderer";
-import { motionPhase, sampleTrack, type Key } from "../core/track";
+import { clamp, easeOutCubic, invLerp, lerp, lerpDeg } from "../core/math";
+import type { Beat } from "../core/renderer";
+import { sampleTrack, type Key } from "../core/track";
 import { depthScale, makeView, sx, sy, type Camera, type FrameInput, type View } from "../core/view";
-import { drawAstronaut } from "../layers/astronaut";
 import { drawCaptions, type CaptionBlock, type CaptionLine } from "../layers/captions";
-import { EarthGL } from "../layers/earth/earthGL";
+import type { EarthGlobe } from "../layers/earth/earthGL";
 import { PLACES } from "../layers/earth/geoData";
-import { bodyToView, projectLonLat, type Globe } from "../layers/earth/globe";
+import { bodyToView, projectLonLat } from "../layers/earth/globe";
 import { drawArc, drawPin } from "../layers/earth/markers";
 import { OrbitSwarm } from "../layers/earth/orbitSwarm";
 import { SpaceLayer } from "../layers/space";
 import { SunLayer, type SunPlacement } from "../layers/sun";
+import { lightFrom, type Assets, type Chapter } from "./chapter";
+import { drawMascot, type Pose } from "./mascot";
 
 export type EarthBeatId = "intro" | "home" | "study" | "teach" | "languages" | "outro";
 export type EarthCopy = Record<EarthBeatId, CaptionLine[]>;
@@ -65,7 +66,6 @@ const FOCUS: Key<{ w: number; lon: number; lat: number }>[] = [
   [30.6, { w: 0, lon: 9, lat: 40 }],
 ];
 
-type Pose = { dx: number; dy: number; rot: number; armL: number; armR: number; wave: number };
 const P = {
   intro: { dx: -1.55, dy: -0.45, rot: -0.15, armL: 2.5, armR: 0.35, wave: 1 },
   home: { dx: -1.12, dy: -0.66, rot: 0.18, armL: 0.5, armR: -0.95, wave: 0 },
@@ -81,7 +81,9 @@ const POSES: Key<Pose>[] = [
   [12.6, P.study], [16.8, P.study],
   [18.2, P.teach], [22.6, P.teach],
   [24, P.languages], [28.2, P.languages],
-  [30.2, P.outro],
+  [30.2, P.outro], [30.9, P.outro],
+  // Flies off towards the Moon so the next chapter can bring it back in.
+  [32, { ...P.outro, dx: 5, dy: -4.5, rot: 0.6 }],
 ];
 
 const PIN_IN = 7.6;
@@ -92,30 +94,22 @@ const ARCS = [
 ];
 const ARC_TIME = 1.6;
 
-export class EarthChapter implements Story {
+/** Chapter 1 · Earth: who I am, where I study, teaching and languages. */
+export class EarthChapter implements Chapter {
+  readonly id = "earth";
   readonly duration = EARTH_DURATION;
   readonly beats = BEATS;
 
   private space = new SpaceLayer();
   private sun = new SunLayer();
   private swarm = new OrbitSwarm();
-  private earth: EarthGL | null = null;
   private captions: CaptionBlock[];
 
   constructor(copy: EarthCopy) {
     this.captions = BEATS.map((b) => ({ start: b.start, end: b.end, lines: copy[b.id] }));
   }
 
-  async init() {
-    this.earth ??= new EarthGL();
-  }
-
-  dispose() {
-    this.earth?.dispose();
-    this.earth = null;
-  }
-
-  draw(ctx: CanvasRenderingContext2D, { t, ambient, W, H }: FrameInput) {
+  draw(ctx: CanvasRenderingContext2D, { t, ambient, W, H }: FrameInput, assets: Assets) {
     const portrait = W / H < 0.9;
     const camera = sampleTrack(CAMERA[portrait ? "portrait" : "landscape"], t);
     const view = makeView(W, H, camera);
@@ -133,7 +127,7 @@ export class EarthChapter implements Story {
     const swarmClock = ambient * 0.6 + t * 0.4;
     this.swarm.draw(ctx, globe, swarmClock, swarmCount, swarmExit, unit, "back");
 
-    this.earth?.draw(ctx, globe, W, H);
+    assets.earth.draw(ctx, globe, W, H);
 
     const pinExit = invLerp(PIN_OUT, PIN_OUT + 0.5, t);
     drawPin(ctx, globe, m, PLACES.barcelona, t - PIN_IN, pinExit, ambient, unit, "#ffd98a");
@@ -146,49 +140,18 @@ export class EarthChapter implements Story {
 
     this.swarm.draw(ctx, globe, swarmClock, swarmCount, swarmExit, unit, "front");
 
-    this.drawMascot(ctx, view, globe, t, ambient);
+    drawMascot(ctx, view, POSES, EARTH, t, ambient, lookTarget(view, globe, t));
     drawCaptions(ctx, view, this.captions, t);
   }
+}
 
-  private drawMascot(ctx: CanvasRenderingContext2D, view: View, globe: Globe, t: number, ambient: number) {
-    const pose = sampleTrack(POSES, t);
-    const { moving, sinceArrival } = motionPhase(POSES, t);
-    let squash = 1 + 0.1 * Math.sin(Math.PI * moving);
-    squash *= 1 - 0.16 * springKick(sinceArrival, 5, 11);
-
-    const dx = view.portrait ? pose.dx * 0.55 : pose.dx;
-    const dy = view.portrait ? pose.dy * 1.15 : pose.dy;
-    const x = sx(view, EARTH.x + dx * EARTH.r);
-    const y = sy(view, EARTH.y + dy * EARTH.r);
-    const look = this.lookTarget(view, globe, t);
-
-    drawAstronaut(
-      ctx,
-      {
-        x,
-        y,
-        unit: depthScale(view, 0.4) * (view.portrait ? 0.85 : 1),
-        rot: pose.rot,
-        armL: pose.armL,
-        armR: pose.armR,
-        wave: pose.wave,
-        sx: 1 / Math.sqrt(squash),
-        sy: squash,
-        lookX: look.x,
-        lookY: look.y,
-      },
-      ambient,
-    );
-  }
-
-  private lookTarget(view: View, globe: Globe, t: number) {
-    const m = bodyToView(globe);
-    if (t < 6) return view.portrait ? { x: view.W / 2, y: view.H * 0.78 } : { x: view.W * 0.2, y: view.H * 0.62 };
-    if (t < 17.4) return projectLonLat(globe, m, PLACES.barcelona);
-    if (t < 23.4) return { x: globe.x, y: globe.y + globe.r * 0.9 };
-    if (t < 28.6) return projectLonLat(globe, m, [9, 47]);
-    return { x: view.W, y: 0 };
-  }
+function lookTarget(view: View, globe: EarthGlobe, t: number) {
+  const m = bodyToView(globe);
+  if (t < 6) return view.portrait ? { x: view.W / 2, y: view.H * 0.78 } : { x: view.W * 0.2, y: view.H * 0.62 };
+  if (t < 17.4) return projectLonLat(globe, m, PLACES.barcelona);
+  if (t < 23.4) return { x: globe.x, y: globe.y + globe.r * 0.9 };
+  if (t < 28.6) return projectLonLat(globe, m, [9, 47]);
+  return { x: view.W, y: 0 };
 }
 
 function placeSun(view: View): SunPlacement {
@@ -203,25 +166,20 @@ function placeSun(view: View): SunPlacement {
   };
 }
 
-function placeGlobe(view: View, sun: SunPlacement, t: number, ambient: number): Globe {
+function placeGlobe(view: View, sun: SunPlacement, t: number, ambient: number): EarthGlobe {
   const focus = sampleTrack(FOCUS, t);
   const freeLon = -25 - 0.55 * ambient - 2 * t;
   const x = sx(view, EARTH.x);
   const y = sy(view, EARTH.y);
-  const dx = sun.x - x;
-  const dy = sun.y - y;
-  const len = Math.hypot(dx, dy) || 1;
-  // The Sun sits off to the side, slightly towards the camera, so most of
-  // the visible face is lit and the terminator crosses the far side.
-  const lz = 0.6 * len;
-  const ln = Math.hypot(dx, dy, lz);
   return {
     x,
     y,
     r: EARTH.r * view.scale,
     lon: lerpDeg(freeLon, focus.lon, focus.w),
     lat: lerp(12, focus.lat, focus.w),
-    light: [dx / ln, -dy / ln, lz / ln],
+    // The Sun sits off to the side, slightly towards the camera, so most of
+    // the visible face is lit and the night side keeps its city lights.
+    light: lightFrom(sun.x, sun.y, x, y, 0.6),
     cloudShift: ambient * 0.0012 + t * 0.002,
   };
 }

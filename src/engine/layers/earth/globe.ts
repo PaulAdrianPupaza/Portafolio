@@ -3,7 +3,7 @@ import type { LonLat } from "./geoData";
 
 export const TILT = 0.26;
 
-/** Everything needed to draw the globe and things pinned to it, in device pixels. */
+/** Everything needed to draw a planet and things pinned to it, in device pixels. */
 export interface Globe {
   x: number;
   y: number;
@@ -13,13 +13,13 @@ export interface Globe {
   lat: number;
   /** Unit vector towards the Sun in view space (x right, y up, z to camera). */
   light: Vec3;
-  /** Cloud layer offset in texture units. */
-  cloudShift: number;
+  /** Axial tilt in radians, leaning right; defaults to the Earth's TILT. */
+  tilt?: number;
 }
 
-/** Body (lon/lat) space → view space. The axis leans right by TILT. */
+/** Body (lon/lat) space → view space. */
 export const bodyToView = (g: Globe): Mat3 =>
-  mat3Mul(rotZ(-TILT), mat3Mul(rotX(g.lat * DEG), rotY(-g.lon * DEG)));
+  mat3Mul(rotZ(-(g.tilt ?? TILT)), mat3Mul(rotX(g.lat * DEG), rotY(-g.lon * DEG)));
 
 export function lonLatToBody([lon, lat]: LonLat): Vec3 {
   const la = lat * DEG, lo = lon * DEG;

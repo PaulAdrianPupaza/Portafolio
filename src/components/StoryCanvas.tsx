@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { clamp } from "@/engine/core/math";
 import { Renderer } from "@/engine/core/renderer";
 import { setFontFamily } from "@/engine/core/text";
-import { EARTH_DURATION, EarthChapter, type EarthCopy } from "@/engine/story/earthChapter";
+import { JOURNEY_DURATION, Journey, type JourneyCopy } from "@/engine/story/journey";
 import styles from "./StoryCanvas.module.css";
 
 /** Viewport heights of scrolling per second of narrative time. */
-const VH_PER_SECOND = 30;
+const VH_PER_SECOND = 22;
 /** Keeps very large screens from shading more pixels than they need. */
 const MAX_PIXELS = 3.4e6;
 
@@ -18,7 +18,7 @@ export async function loadCanvasFonts() {
   await Promise.all([document.fonts.load(`600 32px ${family}`), document.fonts.load(`700 32px ${family}`)]);
 }
 
-export function StoryCanvas({ copy, scrollHint }: { copy: EarthCopy; scrollHint: string }) {
+export function StoryCanvas({ copy, scrollHint }: { copy: JourneyCopy; scrollHint: string }) {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [atTop, setAtTop] = useState(true);
@@ -26,7 +26,7 @@ export function StoryCanvas({ copy, scrollHint }: { copy: EarthCopy; scrollHint:
   useEffect(() => {
     const section = sectionRef.current!;
     const canvas = canvasRef.current!;
-    const story = new EarthChapter(copy);
+    const story = new Journey(copy);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let renderer: Renderer | null = null;
     let disposed = false;
@@ -103,7 +103,7 @@ export function StoryCanvas({ copy, scrollHint }: { copy: EarthCopy; scrollHint:
   }, [copy]);
 
   return (
-    <section ref={sectionRef} className={styles.story} style={{ height: `calc(${EARTH_DURATION * VH_PER_SECOND}vh + 100vh)` }}>
+    <section ref={sectionRef} className={styles.story} style={{ height: `calc(${JOURNEY_DURATION * VH_PER_SECOND}vh + 100vh)` }}>
       <div className={styles.stage}>
         <canvas ref={canvasRef} className={styles.canvas} aria-hidden="true" />
         <p className={styles.hint} data-hidden={!atTop} aria-hidden="true">

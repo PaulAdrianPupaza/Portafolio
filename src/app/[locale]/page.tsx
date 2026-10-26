@@ -20,7 +20,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <p key={line}>{line}</p>
           ))}
         </div>
-        <StoryCanvas copy={dict.earth} scrollHint={dict.nav.scrollHint} />
+        <StoryCanvas copy={dict.journey} scrollHint={dict.nav.scrollHint} />
         <Faq dict={dict} />
       </main>
     </>

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Renderer } from "@/engine/core/renderer";
 import { renderContactSheet } from "@/engine/export/contactSheet";
 import { exportMp4 } from "@/engine/export/mp4";
-import { EARTH_DURATION, EarthChapter, type EarthCopy } from "@/engine/story/earthChapter";
+import { JOURNEY_DURATION, Journey, type JourneyCopy } from "@/engine/story/journey";
 import { loadCanvasFonts } from "./StoryCanvas";
 import styles from "./Studio.module.css";
 
@@ -14,9 +14,9 @@ type Output = { url: string; name: string };
  * Development-only tools: scrub any moment with seek(t), generate the
  * contact sheet of every beat, and export the chapter as a 1080p30 MP4.
  */
-export function Studio({ copy, locale }: { copy: EarthCopy; locale: string }) {
+export function Studio({ copy, locale }: { copy: JourneyCopy; locale: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const storyRef = useRef<EarthChapter | null>(null);
+  const storyRef = useRef<Journey | null>(null);
   const rendererRef = useRef<Renderer | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const [ready, setReady] = useState(false);
@@ -26,10 +26,10 @@ export function Studio({ copy, locale }: { copy: EarthCopy; locale: string }) {
   const [sheet, setSheet] = useState<Output | null>(null);
   const [video, setVideo] = useState<Output | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const duration = EARTH_DURATION;
+  const duration = JOURNEY_DURATION;
 
   useEffect(() => {
-    const story = new EarthChapter(copy);
+    const story = new Journey(copy);
     let cancelled = false;
     (async () => {
       await loadCanvasFonts();
@@ -71,7 +71,7 @@ export function Studio({ copy, locale }: { copy: EarthCopy; locale: string }) {
     renderContactSheet(story).toBlob((blob) => {
       if (!blob) return;
       if (sheet) URL.revokeObjectURL(sheet.url);
-      setSheet({ url: URL.createObjectURL(blob), name: `earth-contact-sheet-${locale}.png` });
+      setSheet({ url: URL.createObjectURL(blob), name: `journey-contact-sheet-${locale}.png` });
     });
     rendererRef.current?.render(t, t);
   };
@@ -89,7 +89,7 @@ export function Studio({ copy, locale }: { copy: EarthCopy; locale: string }) {
         onProgress: (done, total) => setProgress(done / total),
       });
       if (video) URL.revokeObjectURL(video.url);
-      setVideo({ url: URL.createObjectURL(blob), name: `earth-${locale}-1080p30.mp4` });
+      setVideo({ url: URL.createObjectURL(blob), name: `journey-${locale}-1080p30.mp4` });
     } catch (e) {
       if ((e as Error).name !== "AbortError") setError(String(e));
     } finally {
@@ -103,7 +103,7 @@ export function Studio({ copy, locale }: { copy: EarthCopy; locale: string }) {
 
   return (
     <div className={styles.studio}>
-      <h1 className={styles.title}>Studio · Earth chapter</h1>
+      <h1 className={styles.title}>Studio · Journey</h1>
       <canvas ref={canvasRef} className={styles.preview} />
 
       <div className={styles.row}>
