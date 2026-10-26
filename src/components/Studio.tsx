@@ -94,6 +94,33 @@ export function Studio({ copy, locale }: { copy: JourneyCopy; locale: string }) 
     setNotice(res.ok ? "Share image saved to src/app/[locale]/opengraph-image.png and twitter-image.png" : null);
   };
 
+  // README screenshots: real frames of key beats, desktop and phone framing.
+  const saveScreenshots = async () => {
+    const story = storyRef.current;
+    if (!story) return;
+    setError(null);
+    const shots = [
+      { name: "earth", t: 1.2, w: 1600, h: 900 },
+      { name: "teaching", t: 20.6, w: 1600, h: 900 },
+      { name: "moon", t: 40, w: 1600, h: 900 },
+      { name: "sun", t: 66.4, w: 1600, h: 900 },
+      { name: "mobile-earth", t: 9.6, w: 780, h: 1688 },
+      { name: "mobile-moon", t: 46, w: 780, h: 1688 },
+    ];
+    const canvas = document.createElement("canvas");
+    const renderer = new Renderer(canvas, story);
+    for (const shot of shots) {
+      renderer.resize(shot.w, shot.h);
+      renderer.render(shot.t, shot.t);
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.88));
+      if (!blob) return setError(`Could not encode ${shot.name}`);
+      const res = await fetch(`/api/dev/screenshot?name=${shot.name}`, { method: "POST", body: blob });
+      if (!res.ok) return setError(`Saving ${shot.name} failed (${res.status})`);
+    }
+    rendererRef.current?.render(t, t);
+    setNotice(`Saved ${shots.length} screenshots to docs/screenshots`);
+  };
+
   const makeVideo = async () => {
     const story = storyRef.current;
     if (!story) return;
@@ -150,6 +177,9 @@ export function Studio({ copy, locale }: { copy: JourneyCopy; locale: string }) 
         </button>
         <button onClick={saveShareImage} disabled={!ready || busy}>
           Save share image · 1200×630
+        </button>
+        <button onClick={saveScreenshots} disabled={!ready || busy}>
+          Save README screenshots
         </button>
         {busy && (
           <>
