@@ -1,12 +1,12 @@
 import { gauss, mulberry32, range } from "../../core/random";
 import type { Globe } from "../earth/globe";
-import { SphereGL } from "../sphereGL";
+import { SphereGL, type GLMode, type PlanetRenderer } from "../sphereGL";
 
 const MAP_W = 1024;
 const MAP_H = 512;
 
 /** Flat, stylised lunar map: pale highlands, dark maria, craters lit from the upper left. */
-function paintMoonMap() {
+export function paintMoonMap() {
   const c = document.createElement("canvas");
   c.width = MAP_W;
   c.height = MAP_H;
@@ -112,9 +112,9 @@ vec4 shade(vec2 p) {
 `;
 
 /** The Moon: crater map with a sharp terminator so phases read clearly. */
-export class MoonGL extends SphereGL {
-  constructor() {
-    super(SHADE, [], [["uMap", paintMoonMap()]]);
+export class MoonGL extends SphereGL implements PlanetRenderer {
+  constructor(map: HTMLCanvasElement, mode: GLMode = "auto") {
+    super(SHADE, [], [["uMap", map]], mode);
   }
 
   draw(ctx: CanvasRenderingContext2D, globe: Globe, W: number, H: number) {

@@ -2,7 +2,10 @@ import { clamp, smoothstep } from "../core/math";
 import type { Beat, Story } from "../core/renderer";
 import type { FrameInput } from "../core/view";
 import { EarthGL } from "../layers/earth/earthGL";
-import { MoonGL } from "../layers/moon/moonGL";
+import { paintEarthTextures } from "../layers/earth/earthTexture";
+import { FlatPlanet } from "../layers/flatPlanet";
+import { MoonGL, paintMoonMap } from "../layers/moon/moonGL";
+import type { GLMode } from "../layers/sphereGL";
 import type { Assets, Chapter } from "./chapter";
 import { EARTH_DURATION, EarthChapter, type EarthCopy } from "./earthChapter";
 import { MOON_DURATION, MoonChapter, type MoonCopy } from "./moonChapter";
@@ -12,6 +15,15 @@ export interface JourneyCopy {
   earth: EarthCopy;
   moon: MoonCopy;
   sun: SunCopy;
+}
+
+function tryCreate<T>(make: () => T): T | null {
+  try {
+    return make();
+  } catch (err) {
+    console.warn("Planet renderer unavailable, trying the next option", err);
+    return null;
+  }
 }
 
 /** Seconds during which one chapter dissolves into the next. */
@@ -51,9 +63,34 @@ export class Journey implements Story {
     );
   }
 
-  async init() {
-    this.assets ??= { earth: new EarthGL(), moon: new MoonGL() };
+  /**
+   * Builds the planet renderers: WebGL2, then WebGL1, then plain canvas 2D, so
+   * the story still plays on devices without WebGL. `renderer` says which one
+   * is in use.
+   */
+  async init(mode: GLMode = "auto") {
+    if (this.assets) return;
+    const earthMaps = paintEarthTextures();
+    const moonMap = paintMoonMap();
+    for (const attempt of mode === "auto" ? (["auto", "webgl1"] as const) : [mode]) {
+      if (attempt === "none") break;
+      const earth = tryCreate(() => new EarthGL(earthMaps, attempt));
+      const moon = earth && tryCreate(() => new MoonGL(moonMap, attempt));
+      if (earth && moon) {
+        this.assets = { earth, moon };
+        this.renderer = attempt === "auto" ? "webgl" : "webgl1";
+        return;
+      }
+      earth?.dispose();
+    }
+    this.assets = {
+      earth: new FlatPlanet(earthMaps.map, { glow: "rgba(120,200,255,0.55)", night: "rgba(10,22,60,0.78)" }),
+      moon: new FlatPlanet(moonMap, { glow: "rgba(200,215,255,0.3)", night: "rgba(10,16,34,0.88)" }),
+    };
+    this.renderer = "2d";
   }
+
+  renderer: "webgl" | "webgl1" | "2d" | null = null;
 
   dispose() {
     this.assets?.earth.dispose();

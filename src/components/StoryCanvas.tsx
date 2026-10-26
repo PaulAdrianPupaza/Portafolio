@@ -5,6 +5,7 @@ import { clamp } from "@/engine/core/math";
 import { Renderer } from "@/engine/core/renderer";
 import { setFontFamily } from "@/engine/core/text";
 import { captionBox } from "@/engine/layers/captions";
+import type { GLMode } from "@/engine/layers/sphereGL";
 import { CHAPTER_STARTS, JOURNEY_DURATION, Journey, type JourneyCopy } from "@/engine/story/journey";
 import styles from "./StoryCanvas.module.css";
 
@@ -42,10 +43,27 @@ interface Props {
   fallback: { heading: string; summary: string[] };
 }
 
+/**
+ * Waits (briefly) for the caption font. A font that fails or is slow to load
+ * must never stop the story: captions then start in the fallback font.
+ */
 export async function loadCanvasFonts() {
   const family = getComputedStyle(document.body).fontFamily;
   setFontFamily(family);
-  await Promise.all([document.fonts.load(`600 32px ${family}`), document.fonts.load(`700 32px ${family}`)]);
+  try {
+    await Promise.race([
+      Promise.all([document.fonts.load(`600 32px ${family}`), document.fonts.load(`700 32px ${family}`)]),
+      new Promise((resolve) => setTimeout(resolve, 2500)),
+    ]);
+  } catch (err) {
+    console.warn("Caption font did not load", err);
+  }
+}
+
+/** `?renderer=webgl1` or `?renderer=2d` forces a fallback path, for testing on any device. */
+function requestedGLMode(): GLMode {
+  const value = new URLSearchParams(window.location.search).get("renderer");
+  return value === "webgl1" ? "webgl1" : value === "2d" ? "none" : "auto";
 }
 
 function chapterAt(t: number): ChapterId {
@@ -58,7 +76,8 @@ export function StoryCanvas({ copy, scrollHint, chaptersLabel, chapters, links, 
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [atTop, setAtTop] = useState(true);
-  const [failed, setFailed] = useState(false);
+  /** Error message when the animation could not run; the plain-text version shows instead. */
+  const [failed, setFailed] = useState<string | null>(null);
   const [chapter, setChapter] = useState<ChapterId>("about");
   const [activeBeat, setActiveBeat] = useState<string | null>("earth · intro");
 
@@ -103,6 +122,12 @@ export function StoryCanvas({ copy, scrollHint, chaptersLabel, chapters, links, 
       if (beat !== shownBeat) setActiveBeat((shownBeat = beat));
     };
 
+    // Any failure shows the plain-text version, with the error so it can be reported.
+    const fail = (err: unknown) => {
+      console.error("Story failed", err);
+      if (!disposed) setFailed(err instanceof Error ? `${err.name}: ${err.message}` : String(err));
+    };
+
     const frame = (now: number) => {
       if (!renderer || !visible) {
         raf = 0;
@@ -113,7 +138,14 @@ export function StoryCanvas({ copy, scrollHint, chaptersLabel, chapters, links, 
       const goal = scrollTime();
       const snap = reduceMotion || Math.abs(goal - t) > SNAP_SECONDS;
       t = snap ? goal : t + (goal - t) * (1 - Math.exp(-dt * 6));
-      renderer.render(t, reduceMotion ? 0 : (now - start) / 1000, { calm: reduceMotion });
+      try {
+        renderer.render(t, reduceMotion ? 0 : (now - start) / 1000, { calm: reduceMotion });
+      } catch (err) {
+        renderer = null;
+        raf = 0;
+        fail(err);
+        return;
+      }
       // Buttons follow the real bottom of the captions, which depends on how
       // many lines the current language needed.
       stage.style.setProperty("--captions-bottom", `${(captionBox.bottom / captionBox.canvasHeight) * 100}%`);
@@ -142,16 +174,14 @@ export function StoryCanvas({ copy, scrollHint, chaptersLabel, chapters, links, 
 
     (async () => {
       await loadCanvasFonts();
-      await story.init();
+      await story.init(requestedGLMode());
       if (disposed) return;
       renderer = new Renderer(canvas, story);
+      canvas.dataset.renderer = story.renderer ?? "";
       resize();
       t = scrollTime();
       wake();
-    })().catch((err) => {
-      console.error("Story failed to start", err);
-      if (!disposed) setFailed(true);
-    });
+    })().catch(fail);
 
     return () => {
       disposed = true;
@@ -169,6 +199,7 @@ export function StoryCanvas({ copy, scrollHint, chaptersLabel, chapters, links, 
       {fallback.summary.map((line) => (
         <p key={line}>{line}</p>
       ))}
+      {failed && <p className={styles.fallbackError}>{failed}</p>}
     </div>
   );
   const beatLinks = activeBeat ? links[activeBeat] : undefined;

@@ -1,13 +1,13 @@
 import type { Vec3 } from "../core/math";
 import type { Beat } from "../core/renderer";
 import type { FrameInput } from "../core/view";
-import type { EarthGL } from "../layers/earth/earthGL";
-import type { MoonGL } from "../layers/moon/moonGL";
+import type { EarthGlobe } from "../layers/earth/earthGL";
+import type { PlanetRenderer } from "../layers/sphereGL";
 
-/** GPU-backed resources shared by every chapter (one WebGL context per planet). */
+/** Planet renderers shared by every chapter: WebGL when available, 2D otherwise. */
 export interface Assets {
-  earth: EarthGL;
-  moon: MoonGL;
+  earth: PlanetRenderer<EarthGlobe>;
+  moon: PlanetRenderer;
 }
 
 /** One stop of the journey. draw() receives chapter-local time and must be pure. */

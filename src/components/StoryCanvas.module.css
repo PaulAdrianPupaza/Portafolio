@@ -146,6 +146,13 @@
   line-height: 1.6;
 }
 
+.fallbackError {
+  color: rgba(185, 207, 224, 0.55);
+  font-size: 12px;
+  font-family: ui-monospace, monospace;
+  word-break: break-word;
+}
+
 .fallbackHeading {
   color: var(--text);
   font-size: clamp(24px, 4vw, 36px);

@@ -23,6 +23,7 @@
 .link,
 .cv,
 .lang {
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -75,6 +76,15 @@
   }
 
   .link {
-    padding: 0 10px;
+    padding: 0 8px;
+  }
+
+  .cv {
+    padding: 0 12px;
+  }
+
+  .lang {
+    min-width: 40px;
+    padding: 0 6px;
   }
 }

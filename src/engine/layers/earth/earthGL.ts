@@ -1,5 +1,5 @@
-import { SphereGL } from "../sphereGL";
-import { paintEarthTextures } from "./earthTexture";
+import { SphereGL, type GLMode, type PlanetRenderer } from "../sphereGL";
+import type { paintEarthTextures } from "./earthTexture";
 import type { Globe } from "./globe";
 
 const SHADE = `
@@ -65,10 +65,9 @@ export type EarthGlobe = Globe & {
 };
 
 /** The Earth: painted map, drifting clouds, night-side city lights, ocean glint. */
-export class EarthGL extends SphereGL {
-  constructor() {
-    const { map, aux } = paintEarthTextures();
-    super(SHADE, ["uCloudShift"], [["uMap", map], ["uAux", aux]]);
+export class EarthGL extends SphereGL implements PlanetRenderer<EarthGlobe> {
+  constructor(textures: ReturnType<typeof paintEarthTextures>, mode: GLMode = "auto") {
+    super(SHADE, ["uCloudShift"], [["uMap", textures.map], ["uAux", textures.aux]], mode);
   }
 
   draw(ctx: CanvasRenderingContext2D, globe: EarthGlobe, W: number, H: number) {
