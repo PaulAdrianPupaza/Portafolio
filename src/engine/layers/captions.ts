@@ -46,6 +46,13 @@ interface LaidOutLine {
 }
 
 /**
+ * Where the most recently drawn caption block ended, in canvas pixels. The page
+ * reads it to place HTML buttons right under the captions, however many lines
+ * the current language wraps them into.
+ */
+export const captionBox = { bottom: 0, canvasHeight: 1 };
+
+/**
  * Captions sit in rounded pills. Each line rises 1.3× its own height
  * through a clip (ease-out-quint) on the way in, and rises out on the way out.
  * Pill and text share one envelope, so a pill is never shown empty and a
@@ -75,6 +82,8 @@ export function drawCaptions(ctx: CanvasRenderingContext2D, view: View, blocks: 
   let top = view.portrait ? view.H * 0.7 : view.H * 0.6 - blockH / 2;
   // Stay clear of the bottom edge (browser toolbars and the scroll hint).
   if (view.portrait) top = Math.min(top, view.H * 0.88 - blockH);
+  captionBox.bottom = top + blockH;
+  captionBox.canvasHeight = view.H;
 
   let y = top;
   lines.forEach((line, i) => {

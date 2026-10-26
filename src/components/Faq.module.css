@@ -100,15 +100,20 @@
   list-style: none;
 }
 
+/* Name on the left, buttons in a right-aligned column, whatever the name's length. */
 .projects li {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 10px;
 }
 
+.projects li > div {
+  display: flex;
+  gap: 8px;
+}
+
 .projects span {
-  min-width: 12em;
   color: var(--text);
 }
 

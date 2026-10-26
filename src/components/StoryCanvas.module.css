@@ -28,7 +28,8 @@
 .actions {
   position: absolute;
   left: 7%;
-  top: 74%;
+  /* --captions-bottom is set every frame from the canvas caption layout. */
+  top: calc(var(--captions-bottom, 72%) + 18px);
   display: flex;
   flex-wrap: wrap;
   gap: 10px;

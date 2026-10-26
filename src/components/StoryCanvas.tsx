@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { clamp } from "@/engine/core/math";
 import { Renderer } from "@/engine/core/renderer";
 import { setFontFamily } from "@/engine/core/text";
+import { captionBox } from "@/engine/layers/captions";
 import { CHAPTER_STARTS, JOURNEY_DURATION, Journey, type JourneyCopy } from "@/engine/story/journey";
 import styles from "./StoryCanvas.module.css";
 
@@ -64,6 +65,7 @@ export function StoryCanvas({ copy, scrollHint, chaptersLabel, chapters, links, 
   useEffect(() => {
     const section = sectionRef.current!;
     const canvas = canvasRef.current!;
+    const stage = canvas.parentElement!;
     const story = new Journey(copy);
     const linkedBeats = story.beats.filter((b) => links[b.id]);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -112,6 +114,9 @@ export function StoryCanvas({ copy, scrollHint, chaptersLabel, chapters, links, 
       const snap = reduceMotion || Math.abs(goal - t) > SNAP_SECONDS;
       t = snap ? goal : t + (goal - t) * (1 - Math.exp(-dt * 6));
       renderer.render(t, reduceMotion ? 0 : (now - start) / 1000, { calm: reduceMotion });
+      // Buttons follow the real bottom of the captions, which depends on how
+      // many lines the current language needed.
+      stage.style.setProperty("--captions-bottom", `${(captionBox.bottom / captionBox.canvasHeight) * 100}%`);
       syncOverlay();
       raf = requestAnimationFrame(frame);
     };

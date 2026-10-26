@@ -20,11 +20,13 @@ export function Faq({ dict }: { dict: Dictionary }) {
                   {(Object.keys(PROJECT_LINKS) as ProjectId[]).map((id) => (
                     <li key={id}>
                       <span>{dict.projects[id]}</span>
-                      {projectLinks(dict, id).map((link) => (
-                        <a key={link.href + link.label} href={link.href} target="_blank" rel="noreferrer">
-                          {link.label}
-                        </a>
-                      ))}
+                      <div>
+                        {projectLinks(dict, id).map((link) => (
+                          <a key={link.href + link.label} href={link.href} target="_blank" rel="noreferrer">
+                            {link.label}
+                          </a>
+                        ))}
+                      </div>
                     </li>
                   ))}
                 </ul>
