@@ -89,7 +89,8 @@ const POSES: Key<Pose>[] = [
 const PIN_IN = 7.6;
 const PIN_OUT = 28.2;
 const ARCS = [
-  { to: PLACES.dublin, start: 24.2, color: "#8fd8e6" },
+  { to: PLACES.madrid, start: 24.1, color: "#8fd8e6" },
+  { to: PLACES.dublin, start: 24.3, color: "#8fd8e6" },
   { to: PLACES.bucharest, start: 24.6, color: "#8fd8e6" },
 ];
 const ARC_TIME = 1.6;

@@ -244,6 +244,7 @@ export const CITIES: [number, number, number][] = [
 
 export const PLACES = {
   barcelona: [2.17, 41.39] as LonLat,
+  madrid: [-3.7, 40.42] as LonLat,
   dublin: [-6.26, 53.35] as LonLat,
   bucharest: [26.1, 44.43] as LonLat,
 };

@@ -19,12 +19,13 @@ export interface CaptionBlock {
 
 const TONES: Record<Tone, string> = { white: "#ffffff", teal: "#8fd8e6", gold: "#ffd98a" };
 
-// Design-unit font sizes and letter spacing (3–6px at design scale).
+// Design-unit font sizes and letter spacing. Captions are sentence case, so
+// the tracking is lighter than it would be for all caps.
 const SIZES: Record<Size, { px: number; weight: 600 | 700; spacing: number; portrait: number }> = {
-  xl: { px: 74, weight: 700, spacing: 6, portrait: 1.3 },
-  lg: { px: 58, weight: 700, spacing: 6, portrait: 1.35 },
-  md: { px: 34, weight: 600, spacing: 4, portrait: 1.45 },
-  sm: { px: 24, weight: 600, spacing: 3, portrait: 1.6 },
+  xl: { px: 74, weight: 700, spacing: 2, portrait: 1.3 },
+  lg: { px: 58, weight: 700, spacing: 1.5, portrait: 1.35 },
+  md: { px: 34, weight: 600, spacing: 1.2, portrait: 1.45 },
+  sm: { px: 24, weight: 600, spacing: 1, portrait: 1.6 },
 };
 
 const PILL = "rgba(6,20,40,0.62)";
@@ -44,7 +45,7 @@ interface LaidOutLine {
 }
 
 /**
- * Captions are caps in rounded pills. Each line rises 1.3× its own height
+ * Captions sit in rounded pills. Each line rises 1.3× its own height
  * through a clip (ease-out-quint) on the way in, and rises out on the way out.
  * Returns the screen centre of the block, or null when nothing is on screen.
  */
