@@ -6,9 +6,6 @@ import styles from "./SiteHeader.module.css";
 export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
     <header className={styles.header}>
-      <Link href={`/${locale}`} className={styles.mark} aria-label="Paul Adrian Pupaza">
-        PAP
-      </Link>
       <nav className={styles.nav}>
         <a href="#faq" className={styles.pill}>
           {dict.nav.faq}
